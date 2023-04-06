@@ -60,12 +60,15 @@ class Linear_Regression():
         return w, b, J_history, p_history
 
     def predict(self, x, w, b):
+        '''
+        Generalize predict function:
+
+        x - m, n matrix
+        w - n, 1 matrix
+        b - sigular number
+        '''
         
-        m = x.shape[0]
-        f_wb = np.zeros(m)
-        
-        for i in range(m):
-            f_wb[i] = w * x[i] + b
+        f_wb = np.dot(x, w) + b
         
         return f_wb
 
@@ -73,24 +76,15 @@ class Linear_Regression():
         return 'Linear Regression Model'
 
 def main():
-    lr = Linear_Regression()
-    x_train = np.array([1, 2])
-    y_train = np.array([300, 500])
-    # initialize parameters
-    w_init = 0
-    b_init = 0
-    # some gradient descent settings
-    iterations = 10000
-    tmp_alpha = 1.0e-2
+    
+    x_train = np.random.rand(3, 2)
+    w = np.random.rand(2)
+    b = 1
 
-    w_final, b_final, J_hist, p_hist = lr.gradient_descent(x_train, 
-                                                       y_train, 
-                                                       w_init, 
-                                                       b_init, 
-                                                       tmp_alpha, 
-                                                       iterations
-                                                      )
-    print(f"(w,b) found by gradient descent: ({w_final:8.4f},{b_final:8.4f})")
+    lr = Linear_Regression()
+    f_wb = lr.predict(x_train, w, b)
+
+    print(f_wb)
 
 if __name__ == '__main__':
     main()
