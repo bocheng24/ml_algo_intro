@@ -1,5 +1,7 @@
 import math
 import numpy as np
+import copy
+import matplotlib.pyplot as plt
 
 class Linear_Regression():
     
@@ -16,31 +18,27 @@ class Linear_Regression():
 
         f_wb = self.predict(x, w, b)
 
-        djdw = np.mean((f_wb - y) * x)
-        djdb = np.mean(f_wb - y)
+        djdw = 0
+        djdb = 0
 
-        # m = x.shape[0]
-        # djdw = 0
-        # djdb = 0
+        for x_i, y_i, f_wb_i in zip(x, y, f_wb):
 
-        # for i in range(m):
+            djdw += (f_wb_i - y_i) * x_i
+            djdb += f_wb_i - y_i
 
-        #     f_wb_i = w * x[i] + b
+            # print(djdw)
 
-        #     djdw += (f_wb_i - y[i]) * x[i]
-        #     djdb += f_wb_i - y[i]
-
-        # djdw = djdw / m
-        # djdb = djdb / m
+        djdw = djdw / x.shape[0]
+        djdb = djdb / x.shape[0]
 
         return djdw, djdb
     
     def gradient_descent(self, x, y, w_in, b_in, alpha, num_iters):
 
         J_history = []
-        p_history = []
+        
 
-        w = w_in
+        w = copy.deepcopy(w_in)
         b = b_in
 
         for i in range(num_iters):
@@ -51,13 +49,13 @@ class Linear_Regression():
             if i < 100000:
                 cost = self.compute_cost(x, y, w, b)
                 J_history.append(cost)
-                p_history.append([w, b])
+               
 
             if i % math.ceil(num_iters / 10) == 0:
-                output = f'''Iteration {i : 4}: Cost {J_history[-1]:0.2e} djdw: {djdw : 0.3e}, djdb: {djdb : 0.3e} w: {w : 0.3e}, b: {b : 0.5e}'''
+                output = f"Iteration {i:4d}: Cost {J_history[-1]:8.2f}   "
                 print(output)
         
-        return w, b, J_history, p_history
+        return w, b, J_history
 
     def predict(self, x, w, b):
         '''
@@ -77,14 +75,46 @@ class Linear_Regression():
 
 def main():
     
-    x_train = np.random.rand(3, 2)
-    w = np.random.rand(2)
-    b = 1
+    X_train = np.array([[2104, 5, 1, 45], [1416, 3, 2, 40], [852, 2, 1, 35]])
+    y_train = np.array([460, 232, 178])
+    b_init = 785.1811367994083
+    w_init = np.array([ 0.39133535, 18.75376741, -53.36032453, -26.42131618])
 
     lr = Linear_Regression()
-    f_wb = lr.predict(x_train, w, b)
+    tmp_dj_dw, tmp_dj_db = lr.compute_gradient(X_train, y_train, w_init, b_init)
+    print(f'dj_db at initial w,b: {tmp_dj_db}')
+    print(f'dj_dw at initial w,b: \n {tmp_dj_dw}')
 
-    print(f_wb)
+    # initialize parameters
+    initial_w = np.zeros_like(w_init)
+    initial_b = 0.
+    # some gradient descent settings
+    iterations = 1000
+    alpha = 5.0e-7
+    
+    # run gradient descent 
+    w_final, b_final, J_hist = lr.gradient_descent(
+        X_train, 
+        y_train, 
+        initial_w, 
+        initial_b,
+        alpha, 
+        iterations
+    )
+
+    print(f"b,w found by gradient descent: {b_final:0.2f},{w_final} ")
+    m,_ = X_train.shape
+    for i in range(m):
+        print(f"prediction: {np.dot(X_train[i], w_final) + b_final:0.2f}, target value: {y_train[i]}")
+
+        # plot cost versus iteration  
+    fig, (ax1, ax2) = plt.subplots(1, 2, constrained_layout=True, figsize=(12, 4))
+    ax1.plot(J_hist)
+    ax2.plot(100 + np.arange(len(J_hist[100:])), J_hist[100:])
+    ax1.set_title("Cost vs. iteration");  ax2.set_title("Cost vs. iteration (tail)")
+    ax1.set_ylabel('Cost')             ;  ax2.set_ylabel('Cost') 
+    ax1.set_xlabel('iteration step')   ;  ax2.set_xlabel('iteration step') 
+    plt.show()
 
 if __name__ == '__main__':
     main()
