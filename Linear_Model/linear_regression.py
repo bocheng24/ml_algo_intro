@@ -1,6 +1,7 @@
 import math
 import numpy as np
 import copy
+import pandas as pd
 import matplotlib.pyplot as plt
 
 class Linear_Regression():
@@ -56,6 +57,50 @@ class Linear_Regression():
                 print(output)
         
         return w, b, J_history
+    
+    def run_gradient_descent(self, x, y, num_iters, alpha):
+        m, n = x.shape
+
+        w = np.zeros(n)
+        b = 0
+
+        history = {
+            'J_history': [],
+            'b': [],
+            'djdb': []
+        }
+
+        for i in range(n):
+            w_key = f'w_{i}'
+            djdw_key = f'djdw_{i}'
+            history[w_key] = []
+            history[djdw_key] = []
+
+        
+
+        for i in range(num_iters):
+            
+            history['b'].append(b)
+
+            djdw, djdb = self.compute_gradient(x, y, w, b)
+
+            w -= alpha * djdw
+            b -= alpha * djdb
+
+            cost = self.compute_cost(x, y, w, b)
+            
+            history['J_history'].append(cost)
+            history['djdb'].append(djdb)
+
+            for j in range(n):
+                history[f'w_{j}'].append(w[j])
+                history[f'djdw_{j}'].append(djdw[j])
+        
+
+        df = pd.DataFrame(history)
+        return df, w, b
+
+
 
     def predict(self, x, w, b):
         '''
