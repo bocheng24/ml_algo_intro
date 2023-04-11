@@ -24,6 +24,17 @@ class Logistic_Regression():
 
         return g_wb, G
     
+    def compute_cost(self, x, y, w, b):
+
+        m = x.shape[0]
+
+        _, G = self.predict(x, w, b)
+
+        total_cost = (-y) * np.log(G) - (1 - y) * np.log(1 - G)
+        cost = total_cost.mean()
+
+        return cost
+    
 
 def main():
 
