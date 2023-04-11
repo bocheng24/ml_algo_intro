@@ -10,21 +10,24 @@ class Logistic_Regression():
 
         return g
     
+    def predict(self, x, w, b):
+        
+        m = x.shape[0]
+        g_wb = np.zeros(m)
+
+        Z = np.dot(x, w) + b
+        G = np.array([self.sigmoid(z)for z in Z ])
+
+        for i in range(m):
+            if G[i] > 0.5:
+                g_wb[i] = 1
+
+        return g_wb, G
+    
 
 def main():
 
-    z = np.arange(-10, 11)
-    lgr = Logistic_Regression()
-
-    y = lgr.sigmoid(z)
-
-    df = pd.DataFrame({'z': z, 'y': y})
-    print(df)
-
-    fig, ax = plt.subplots(1, 1, figsize = (12, 8))
-    ax.plot(z, y)
-
-    plt.show()
+    pass
 
 if __name__ == '__main__':
     main()
